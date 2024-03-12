@@ -12,10 +12,9 @@ const sendMessage = asyncHandler(async (req, res) => {
     return res.sendStatus(400);
   }
 
-    
-    
   try {
-    const flaskApiEndpoint = "http://localhost:5000/predictSentiment";
+    const flaskApiEndpoint =
+      "https://c1bf-150-129-63-34.ngrok-free.app/predictSentiment";
     const modelResponse = await axios.post(flaskApiEndpoint, {
       text: content,
     });
@@ -30,8 +29,6 @@ const sendMessage = asyncHandler(async (req, res) => {
     return res.status(400).json({ error: error.message });
   }
 
-    
-    
   var newMessage = {
     sender: req.user._id,
     content: content,
