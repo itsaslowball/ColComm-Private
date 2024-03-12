@@ -14,7 +14,7 @@ const sendMessage = asyncHandler(async (req, res) => {
 
   try {
     const flaskApiEndpoint =
-      "https://c1bf-150-129-63-34.ngrok-free.app/predictSentiment";
+      "https://monthly-caring-bear.ngrok-free.app/predictSentiment";
     const modelResponse = await axios.post(flaskApiEndpoint, {
       text: content,
     });
