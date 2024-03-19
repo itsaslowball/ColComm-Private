@@ -4,10 +4,15 @@ const User = require("../models/userModel");
 const Chat = require("../models/chatModel");
 const axios = require("axios");
 
-const sendMessage = asyncHandler(async (req, res) => {
-  const { content, chatId } = req.body;
 
-  if (!content || !chatId) {
+
+const sendMessage = asyncHandler(async (req, res) => {
+  const content = req.body.content;
+  const chatId = req.body.chatId;
+  const imageFile = req.files[0]; // Assuming only one file is uploaded
+ 
+
+  if ((!content && !imageFile) || !chatId) {
     console.log("Invalid data passed into request");
     return res.sendStatus(400);
   }
@@ -18,26 +23,32 @@ const sendMessage = asyncHandler(async (req, res) => {
     const modelResponse = await axios.post(flaskApiEndpoint, {
       text: content,
     });
-    //   res.send(modelResponse.data);
-    const label = modelResponse.data[0].label;
 
+    const label = modelResponse.data[0].label;
     if (label === "negative") {
-      throw new Error("Hatefull or Abusive Text");
+      throw new Error("Hateful or Abusive Text");
     }
   } catch (error) {
     console.error(error.message);
     return res.status(400).json({ error: error.message });
   }
 
-  var newMessage = {
+  // Create a new message object
+  const newMessage = {
     sender: req.user._id,
     content: content,
     chat: chatId,
   };
+  
+  // If an image file is uploaded, add image data to the message object
+  if (imageFile) {
+        newMessage.imageName = imageFile.filename;
+  }
+  console.log(newMessage);
 
   try {
     var message = await Message.create(newMessage);
-
+    console.log(message);
     message = await message.populate("sender", "name pic");
     message = await message.populate("chat");
     message = await User.populate(message, {
@@ -53,6 +64,9 @@ const sendMessage = asyncHandler(async (req, res) => {
     throw new Error(error.message);
   }
 });
+
+
+
 
 const allMessages = asyncHandler(async (req, res) => {
   try {

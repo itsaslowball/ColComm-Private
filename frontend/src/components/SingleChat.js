@@ -20,6 +20,8 @@ import "./styles.css";
 import io from "socket.io-client";
 import Lottie from "react-lottie";
 import animationData from "../animation/typing.json";
+import { Button, Icon } from "@chakra-ui/react";
+import { AddIcon } from "@chakra-ui/icons";
 
 const ENDPOINT = "http://localhost:8000";
 var socket, selectedChatCompare;
@@ -30,7 +32,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const newUser = JSON.parse(localStorage.getItem("userInfo"));
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [newMessage, setNewMessage] = useState();
+  const [newMessage, setNewMessage] = useState("");
+  const [selectedImage, setSelectedImage] = useState(null);
   const [socketConnected, setSocketConnected] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [typing, setTyping] = useState(false);
@@ -68,13 +71,15 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         `/api/message/${selectedChat._id}`,
         config
       );
+
       setMessages(data);
+
       setLoading(false);
 
       socket.emit("join chat", selectedChat._id);
     } catch (error) {
       toast({
-        title: "Error Occured",
+        title: "Error Occurred",
         description: "Failed to Load the Message",
         status: "error",
         duration: 5000,
@@ -84,58 +89,62 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }
   };
 
-  const sendMessage = async (event) => {
-    if (event.key === "Enter" && newMessage) {
-      socket.emit("stop typing", selectedChat._id);
-      try {
-        const config = {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        };
-        setNewMessage("");
-        const { data } = await axios.post(
-          "/api/message",
-          {
-            content: newMessage,
-            chatId: selectedChat._id,
-          },
-          config
-        );
+  const sendMessage = async () => {
+    try {
+      const formData = new FormData();
 
-        socket.emit("new message", data);
-        setMessages([...messages, data]);
-      } catch (error) {
-        
-        const err = error.response.data.error;
-        if (err === "Hatefull or Abusive Text") {
-          toast({
-            title: err,
-            description: "Failed to send the message",
-            status: "error",
-            duration: 5000,
-            isClosable: true,
-            position: "bottom",
-          });
-        } else {
-          toast({
-            title: "Error Occured",
-            description: "Failed to send the message",
-            status: "error",
-            duration: 5000,
-            isClosable: true,
-            position: "bottom",
-          });
-        }
+      formData.append("chatId", selectedChat._id);
+      formData.append("content", newMessage);
+      if (selectedImage) {
+        formData.append("image", selectedImage);
+      }
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      setNewMessage("");
+      setSelectedImage(null);
+
+      const { data } = await axios.post("/api/message", formData, config);
+      console.log(data);
+      setMessages([...messages, data]);
+
+      socket.emit("new message", data);
+    } catch (error) {
+      const err = error.response.data.error;
+      if (err === "Hateful or Abusive Text") {
+        toast({
+          title: err,
+          description: "Failed to send the message",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom",
+        });
+      } else {
+        toast({
+          title: "Error Occurred",
+          description: "Failed to send the message",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom",
+        });
       }
     }
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    setSelectedImage(file);
   };
 
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
 
-    //Typing indicator logic
     if (!socketConnected) return;
 
     if (!typing) {
@@ -182,7 +191,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       {selectedChat ? (
         <>
           <Text
-            ontSize={{ base: "28px", md: "30px" }}
+            fontSize={{ base: "28px", md: "30px" }}
             pb={3}
             px={2}
             width="100%"
@@ -230,7 +239,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             borderRadius="lg"
             overFlowY="hidden"
           >
-            {/* messeges here */}
             {loading ? (
               <Spinner
                 size="xl"
@@ -241,11 +249,18 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               />
             ) : (
               <div className="messages">
+                {/* {
+                    messages.map((message) => {
+                      return (
+                        {cons}
+                      )
+                    })
+                  } */}
                 <ScrollableChat messages={messages} />
               </div>
             )}
 
-            <FormControl onKeyDown={sendMessage} isRequired>
+            <FormControl isRequired>
               {isTyping ? (
                 <div>
                   <Lottie
@@ -264,8 +279,43 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 placeholder="Enter a message..."
                 onChange={typingHandler}
                 value={newMessage}
+                style={{ paddingRight: "3rem" }} // Add extra space for the button
               />
+              {/* Image upload button */}
+              <label
+                htmlFor="imageUpload"
+                style={{
+                  position: "absolute",
+                  right: "1rem",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                }}
+              >
+                <Icon as={AddIcon} boxSize={6} style={{ cursor: "pointer" }} />
+              </label>
+              <input
+                type="file"
+                id="imageUpload"
+                accept="image/*"
+                style={{ display: "none" }}
+                onChange={handleFileChange}
+              />
+              {/* Display selected image */}
+              {selectedImage && (
+                <div>
+                  <img
+                    src={URL.createObjectURL(selectedImage)}
+                    alt="Selected Image"
+                    style={{
+                      maxWidth: "100%",
+                      maxHeight: "200px",
+                      marginTop: "1rem",
+                    }}
+                  />
+                </div>
+              )}
             </FormControl>
+            <button onClick={sendMessage}>Send</button>
           </Box>
         </>
       ) : (

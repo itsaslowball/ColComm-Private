@@ -9,11 +9,30 @@ const messageRoutes = require("./routes/messageRoutes");
 const blogRoutes = require("./routes/blogRoutes");
 const path = require("path");
 
+
 const app = express();
 dotenv.config();
 connectDB();
 
 app.use(express.json());
+
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./frontend/src/images/");
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now();
+    cb(null, uniqueSuffix + file.originalname);
+  },
+});
+
+const upload = multer({ storage: storage });
+app.use(upload.any());
+
+
+
 
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
@@ -24,7 +43,7 @@ const __dirname1 = path.resolve();
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname1, "/frontend/build")));
   app.get("*", (req, res) => {
-      res.sendFile(path.resolve(__dirname1, 'frontend', 'build', 'index.html'));
+    res.sendFile(path.resolve(__dirname1, "frontend", "build", "index.html"));
   });
 } else {
   app.get("/", function (req, res) {
