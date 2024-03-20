@@ -32,6 +32,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const newUser = JSON.parse(localStorage.getItem("userInfo"));
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loading2, setLoading2] = useState(false);
+
   const [newMessage, setNewMessage] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
   const [socketConnected, setSocketConnected] = useState(false);
@@ -91,14 +93,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   const sendMessage = async () => {
     try {
-      const formData = new FormData();
+      // const formData = new FormData();
 
-      formData.append("chatId", selectedChat._id);
-      formData.append("content", newMessage);
-      if (selectedImage) {
-        formData.append("image", selectedImage);
-      }
-
+      // formData.append("chatId", selectedChat._id);
+      // formData.append("content", newMessage);
+      // if (selectedImage) {
+      //   formData.append("image", selectedImage);
+      // }
       const config = {
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -107,9 +108,16 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
       setNewMessage("");
       setSelectedImage(null);
+      const { data } = await axios.post(
+        "/api/message",
+        {
+          content: newMessage,
+          chatId: selectedChat._id,
+          imageUrl: selectedImage,
+        },
+        config
+      );
 
-      const { data } = await axios.post("/api/message", formData, config);
-      console.log(data);
       setMessages([...messages, data]);
 
       socket.emit("new message", data);
@@ -139,7 +147,25 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
-    setSelectedImage(file);
+
+    const Formdata = new FormData();
+    Formdata.append("file", file);
+    Formdata.append("upload_preset", "chatApp");
+    Formdata.append("cloud_name", "dyp1jkmgz");
+    setLoading2(true);
+    fetch("https://api.cloudinary.com/v1_1/dyp1jkmgz/image/upload", {
+      method: "post",
+      body: Formdata,
+    })
+      .then((res) => res.json())
+      .then((Formdata) => {
+        setSelectedImage(Formdata.url.toString());
+        setLoading2(false);
+        
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const typingHandler = (e) => {
@@ -167,6 +193,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   useEffect(() => {
     fetchMessages();
+    setSelectedImage(null);
     selectedChatCompare = selectedChat;
   }, [selectedChat]);
 
@@ -304,7 +331,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               {selectedImage && (
                 <div>
                   <img
-                    src={URL.createObjectURL(selectedImage)}
+                    src={selectedImage}
                     alt="Selected Image"
                     style={{
                       maxWidth: "100%",
@@ -315,7 +342,17 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 </div>
               )}
             </FormControl>
-            <button onClick={sendMessage}>Send</button>
+            {loading2 ? (
+              <Spinner
+                size="l"
+                w={"10"}
+                h={"10"}
+                alignSelf="center"
+                margin="auto"
+              />
+            ) : (
+              <button onClick={sendMessage}>Send</button>
+            )}
           </Box>
         </>
       ) : (

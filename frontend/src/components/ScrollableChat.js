@@ -40,11 +40,11 @@ const ScrollableChat = ({ messages }) => {
                 marginTop: isSameSender(messages, m, i, user._id) ? 3 : 10,
               }}
             >
-              {m.imageName && (
+              {m.imageUrl && (
                 <img
-                  src={require(`../images/${m.imageName}`)}
-                  height={100}
-                  width={100}
+                  src={m.imageUrl}
+                  height='200vh'
+                  width='200vh'
                 />
               )}
               {m.content}

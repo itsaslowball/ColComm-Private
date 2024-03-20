@@ -9,13 +9,18 @@ const axios = require("axios");
 const sendMessage = asyncHandler(async (req, res) => {
   const content = req.body.content;
   const chatId = req.body.chatId;
-  const imageFile = req.files[0]; // Assuming only one file is uploaded
- 
+  const imageUrl = req.body.imageUrl;
 
-  if ((!content && !imageFile) || !chatId) {
+  if (!chatId) {
     console.log("Invalid data passed into request");
     return res.sendStatus(400);
   }
+
+  if (!content && !imageUrl) {
+    console.log("Invalid data passed into request");
+    return res.sendStatus(400);
+  }
+ 
 
   try {
     const flaskApiEndpoint =
@@ -38,17 +43,18 @@ const sendMessage = asyncHandler(async (req, res) => {
     sender: req.user._id,
     content: content,
     chat: chatId,
+    imageUrl: imageUrl
   };
   
   // If an image file is uploaded, add image data to the message object
-  if (imageFile) {
-        newMessage.imageName = imageFile.filename;
-  }
-  console.log(newMessage);
+  // if (imageFile) {
+  //       newMessage.imageName = imageFile.filename;
+  // }
+  // console.log(newMessage);
 
   try {
     var message = await Message.create(newMessage);
-    console.log(message);
+    
     message = await message.populate("sender", "name pic");
     message = await message.populate("chat");
     message = await User.populate(message, {

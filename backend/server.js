@@ -16,20 +16,20 @@ connectDB();
 
 app.use(express.json());
 
-const multer = require("multer");
+// const multer = require("multer");
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./frontend/src/images/");
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now();
-    cb(null, uniqueSuffix + file.originalname);
-  },
-});
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, "./frontend/src/images/");
+//   },
+//   filename: function (req, file, cb) {
+//     const uniqueSuffix = Date.now();
+//     cb(null, uniqueSuffix + file.originalname);
+//   },
+// });
 
-const upload = multer({ storage: storage });
-app.use(upload.any());
+// const upload = multer({ storage: storage });
+// app.use(upload.any());
 
 
 
