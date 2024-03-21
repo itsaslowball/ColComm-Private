@@ -108,6 +108,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
       setNewMessage("");
       setSelectedImage(null);
+      console.log(newMessage, selectedChat._id, selectedImage);
       const { data } = await axios.post(
         "/api/message",
         {
@@ -117,6 +118,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         },
         config
       );
+      console.log(data);
 
       setMessages([...messages, data]);
 
@@ -132,9 +134,19 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           isClosable: true,
           position: "bottom",
         });
-      } else {
+      } else if(err === "Hateful or Abusive Image") {
         toast({
-          title: "Error Occurred",
+          title: err,
+          description: "Failed to send the message",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom",
+        });
+      }
+      else {
+        toast({
+          title: "Error Occured",
           description: "Failed to send the message",
           status: "error",
           duration: 5000,
@@ -161,7 +173,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       .then((Formdata) => {
         setSelectedImage(Formdata.url.toString());
         setLoading2(false);
-        
       })
       .catch((err) => {
         console.log(err);
