@@ -23,7 +23,13 @@ import animationData from "../animation/typing.json";
 import { Button, Icon } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 
-const ENDPOINT = "https://colcomm.onrender.com";
+let ENDPOINT;
+
+if (process.env.NODE_ENV === "production") {
+  ENDPOINT = "https://colcomm.onrender.com"; // Live endpoint
+} else {
+  ENDPOINT = "http://localhost:8000"; // Local endpoint
+}
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {

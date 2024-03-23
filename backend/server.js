@@ -9,22 +9,16 @@ const messageRoutes = require("./routes/messageRoutes");
 const blogRoutes = require("./routes/blogRoutes");
 const path = require("path");
 
-
 const app = express();
 dotenv.config();
 connectDB();
 
 app.use(express.json());
 
-
-
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/message", messageRoutes);
 app.use("/api/blogs", blogRoutes);
-
-
-
 
 const __dirname1 = path.resolve();
 if (process.env.NODE_ENV === "production") {
@@ -44,11 +38,18 @@ const PORT = process.env.PORT || 8000;
 
 const server = app.listen(PORT, console.log(`server running on port ${PORT}`));
 
+let socketCorsOrigin;
+
+if (process.env.NODE_ENV === "production") {
+  socketCorsOrigin = "https://colcomm.onrender.com"; // Live origin
+} else {
+  socketCorsOrigin = "http://localhost:3000"; // Local origin
+}
+
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
-    // origin: "http://10.24.50.73:3000",
-    origin: "https://colcomm.onrender.com",
+    origin: socketCorsOrigin,
   },
 });
 
