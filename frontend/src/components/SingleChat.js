@@ -23,7 +23,7 @@ import animationData from "../animation/typing.json";
 import { Button, Icon } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 
-const ENDPOINT = "http://10.24.50.73:8000";
+const ENDPOINT = "https://colcomm.onrender.com";
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
@@ -93,13 +93,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   const sendMessage = async () => {
     try {
-      // const formData = new FormData();
-
-      // formData.append("chatId", selectedChat._id);
-      // formData.append("content", newMessage);
-      // if (selectedImage) {
-      //   formData.append("image", selectedImage);
-      // }
       const config = {
         headers: {
           Authorization: `Bearer ${user.token}`,

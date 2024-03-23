@@ -16,28 +16,15 @@ connectDB();
 
 app.use(express.json());
 
-// const multer = require("multer");
-
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, "./frontend/src/images/");
-//   },
-//   filename: function (req, file, cb) {
-//     const uniqueSuffix = Date.now();
-//     cb(null, uniqueSuffix + file.originalname);
-//   },
-// });
-
-// const upload = multer({ storage: storage });
-// app.use(upload.any());
-
-
 
 
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/message", messageRoutes);
 app.use("/api/blogs", blogRoutes);
+
+
+
 
 const __dirname1 = path.resolve();
 if (process.env.NODE_ENV === "production") {
@@ -60,7 +47,8 @@ const server = app.listen(PORT, console.log(`server running on port ${PORT}`));
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
-    origin: "http://10.24.50.73:3000",
+    // origin: "http://10.24.50.73:3000",
+    origin: "https://colcomm.onrender.com",
   },
 });
 
