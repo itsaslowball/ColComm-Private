@@ -9,9 +9,9 @@ const sendMessage = asyncHandler(async (req, res) => {
   const content = req.body.content;
   const chatId = req.body.chatId;
   const imageUrl = req.body.imageUrl;
-  console.log(imageUrl)
+  
 
-  console.log(".................into the backend............");
+  
 
   if (!chatId) {
     console.log("Invalid data passed into request");
@@ -24,7 +24,7 @@ const sendMessage = asyncHandler(async (req, res) => {
   }
 
   if (imageUrl) {
-    console.log("into the image part")
+    
     let formData = new FormData();
 
     formData.append("language", "eng");
@@ -43,22 +43,25 @@ const sendMessage = asyncHandler(async (req, res) => {
     );
     const imageText = imgData.data.ParsedResults[0].ParsedText;
 
-    try {
-      const flaskApiEndpoint =
-        "https://monthly-caring-bear.ngrok-free.app/predictSentiment";
-      const modelResponse = await axios.post(flaskApiEndpoint, {
-        text: imageText,
-      });
-      console.log(modelResponse);
-      const label = modelResponse.data[0].label;
-      console.log(label);
-      if (label === "negative") {
-        throw new Error("Hateful or Abusive Image");
+    if (imageText.length > 2) {
+      try {
+        const flaskApiEndpoint =
+          "https://monthly-caring-bear.ngrok-free.app/predictSentiment";
+        const modelResponse = await axios.post(flaskApiEndpoint, {
+          text: imageText,
+        });
+
+        const label = modelResponse.data[0].label;
+
+        if (label === "negative") {
+          throw new Error("Hateful or Abusive Image");
+        }
+      } catch (error) {
+        console.error(error.message);
+        return res.status(400).json({ error: error.message });
       }
-    } catch (error) {
-      console.error(error.message);
-      return res.status(400).json({ error: error.message });
     }
+    
   }
 
   // sentimental analysis for text
@@ -69,10 +72,12 @@ const sendMessage = asyncHandler(async (req, res) => {
     const modelResponse = await axios.post(flaskApiEndpoint, {
       text: content,
     });
-
+    
     const label = modelResponse.data[0].label;
-    console.log(label);
-    if (label === "negative") {
+    const score = modelResponse.data[0].score;
+
+    
+    if (label === "negative" || (label === 'neutral' && score < 0.6)) {
       throw new Error("Hateful or Abusive Text");
     }
   } catch (error) {
@@ -88,11 +93,6 @@ const sendMessage = asyncHandler(async (req, res) => {
     imageUrl: imageUrl,
   };
 
-  // If an image file is uploaded, add image data to the message object
-  // if (imageFile) {
-  //       newMessage.imageName = imageFile.filename;
-  // }
-  // console.log(newMessage);
 
   try {
     var message = await Message.create(newMessage);

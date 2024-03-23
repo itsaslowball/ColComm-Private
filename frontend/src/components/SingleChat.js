@@ -23,7 +23,7 @@ import animationData from "../animation/typing.json";
 import { Button, Icon } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 
-const ENDPOINT = "http://localhost:8000";
+const ENDPOINT = "http://10.24.50.73:8000";
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
