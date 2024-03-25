@@ -1,32 +1,59 @@
-import { Box, Button, FormControl, FormLabel, Input, Textarea, useToast } from '@chakra-ui/react';
-import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import { ChatState } from '../Context/ChatProvider';
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Textarea,
+  useToast,
+} from "@chakra-ui/react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { ChatState } from "../Context/ChatProvider";
 
 const CreateBlog = ({ fetchAgain, setFetchAgain }) => {
-    
-const { user, blogs, setBlogs } = ChatState();
-const [title, setTitle] = useState();
-const [content, setContent] = useState();
+  const { user, blogs, setBlogs } = ChatState();
+  const [title, setTitle] = useState();
+  const [content, setContent] = useState();
 
-
-const submitHandler = async () => {
-  try {
-    const { data } = await axios.post("/api/blogs/compose", {
-      title: title,
-      postContent: content,
-      user: user,
-    });
-    setTitle();
-    setContent();
-    setFetchAgain(!fetchAgain);
-  } catch (error) {
-    console.error(error.response.data);
-  }
+  const toast = useToast();
+  const submitHandler = async () => {
+    try {
+      const { data } = await axios.post("/api/blogs/compose", {
+        title: title,
+        postContent: content,
+        user: user,
+      });
+      setTitle("");
+      setContent("");
+      setFetchAgain(!fetchAgain);
+    } catch (error) {
+      // console.error(error.response.data);
+            setTitle("");
+            setContent("");
+            setFetchAgain(!fetchAgain);
+      const err = error.response.data.error;
+      if (err === "Hateful or Abusive Text") {
+        toast({
+          title: err,
+          description: "Failed to send the message",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom",
+        });
+      } else {
+        toast({
+          title: "Error Occured",
+          description: "Failed to send the message",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom",
+        });
+      }
+    }
   };
-  
-  
-
 
   return (
     <Box
@@ -40,6 +67,7 @@ const submitHandler = async () => {
           placeholder="Title of the blog"
           background={"#242526"}
           marginBottom={"20px"}
+          value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
 
@@ -48,6 +76,7 @@ const submitHandler = async () => {
           placeholder="Content of the Blog"
           background={"#242526"}
           marginBottom={"20px"}
+          value={content}
           onChange={(e) => setContent(e.target.value)}
           rows="10"
         />
@@ -62,6 +91,6 @@ const submitHandler = async () => {
       </FormControl>
     </Box>
   );
-}
+};
 
-export default CreateBlog
+export default CreateBlog;
