@@ -75,9 +75,9 @@ const sendMessage = asyncHandler(async (req, res) => {
     
     const label = modelResponse.data[0].label;
     const score = modelResponse.data[0].score;
-
-    
-    if (label === "negative" || (label === 'neutral' && score < 0.6)) {
+    console.log("...............")
+    console.log(label, score);
+    if (label === "negative" || (label === 'neutral' && score < 0.3)) {
       throw new Error("Hateful or Abusive Text");
     }
   } catch (error) {
