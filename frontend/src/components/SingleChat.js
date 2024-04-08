@@ -46,6 +46,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [isTyping, setIsTyping] = useState(false);
   const [typing, setTyping] = useState(false);
 
+
+
   const defaultOptions = {
     loop: true,
     autoPlay: true,
@@ -133,7 +135,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           isClosable: true,
           position: "bottom",
         });
-      } else if(err === "Hateful or Abusive Image") {
+      } else if (err === "Hateful or Abusive Image") {
         toast({
           title: err,
           description: "Failed to send the message",
@@ -142,8 +144,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           isClosable: true,
           position: "bottom",
         });
-      }
-      else {
+      } else {
         toast({
           title: "Error Occured",
           description: "Failed to send the message",
@@ -201,6 +202,31 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }, timerLength);
   };
 
+  const reportUserHandler = async () => {
+      let otherUserId = null;
+      let otherUser = null;
+
+      if (selectedChat && selectedChat.users.length === 2) {
+        if (user._id !== selectedChat.users[0]._id) {
+          otherUserId = selectedChat.users[0]._id;
+          otherUser = selectedChat.users[0];
+        }
+      }
+    const config = {
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+    };
+
+    const { data } = await axios.post(
+      `/api/message/report`,
+      {
+        userId: otherUserId,
+      },
+      config
+    );
+  };
+
   useEffect(() => {
     fetchMessages();
     setSelectedImage(null);
@@ -253,6 +279,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 <ProfileModal
                   user={getSenderFull(newUser, selectedChat.users)}
                 />
+                <button onClick={reportUserHandler}>Report</button>
               </>
             ) : (
               <>

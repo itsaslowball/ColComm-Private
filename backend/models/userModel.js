@@ -33,7 +33,11 @@ const userSchema = mongoose.Schema(
     skillRating: {
       type: Number,
       default: 0
-     }
+    },
+    totalReports: {
+      type: Number, 
+      default: 0
+    }
   },
   { timestamps: true }
 );
