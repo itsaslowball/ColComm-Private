@@ -11,7 +11,7 @@ const reportUser = asyncHandler(async (req, res) => {
   const userId = req.body.userId;
   if (userId) {
     let user = await User.findById(userId);
-    console.log(user);
+
     user = await User.findByIdAndUpdate(
       userId,
       { $inc: { totalReports: 1 } },
@@ -34,11 +34,9 @@ const reportUser = asyncHandler(async (req, res) => {
         // Hash the random password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(randomPassword, salt);
-        const randomEmail = `${uuidv4()}@example.com`;
         // Update user's password, name, and email
         user.password = hashedPassword;
         user.name = "Deleted User";
-        user.email = randomEmail;
         user.pic ="https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg";
 
         await user.save();
@@ -56,6 +54,16 @@ const sendMessage = asyncHandler(async (req, res) => {
   const content = req.body.content;
   const chatId = req.body.chatId;
   const imageUrl = req.body.imageUrl;
+
+  const chat = await Chat.findById(chatId).populate(
+    "users",
+    "totalReports"
+  );
+  if (chat.users[0].totalReports > 3 || chat.users[1].totalReports > 3) {
+    return res.sendStatus(400);
+  }
+ 
+
 
   if (!chatId) {
     console.log("Invalid data passed into request");
@@ -117,8 +125,7 @@ const sendMessage = asyncHandler(async (req, res) => {
 
     const label = modelResponse.data[0].label;
     const score = modelResponse.data[0].score;
-    console.log("...............");
-    console.log(label, score);
+
     if (label === "negative" || (label === "neutral" && score < 0.3)) {
       throw new Error("Hateful or Abusive Text");
     }
