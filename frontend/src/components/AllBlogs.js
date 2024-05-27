@@ -12,50 +12,50 @@ import {
 import axios from "axios";
 import { useEffect } from "react";
 import { ChatState } from "../Context/ChatProvider";
-import { Card, CardBody} from "@chakra-ui/react";
+import { Card, CardBody } from "@chakra-ui/react";
 import ProfileModal from "../components/miscellaneous/ProfileModal";
 
-
 const AllBlogs = ({ fetchAgain, setFetchAgain }) => {
-  const {  blogs, setBlogs } = ChatState();
+  const { blogs, setBlogs } = ChatState();
   const [search, setSearch] = useState();
-  const [allblogs, setAllBlogs] = useState(true)
+  const [allblogs, setAllBlogs] = useState(true);
 
   const user = JSON.parse(localStorage.getItem("userInfo"));
 
   const showBlogs = async () => {
-    const { data } = await axios.get("/api/blogs");
-    setBlogs(data);
+    let { data } = await axios.get("/api/blogs");
+
+    data = data.filter((b) => {
+      return b.user.name !== "Deleted User";
+    });
+
+    console.log("New Data: ", data);
+
+    if (data) setBlogs(data);
     setAllBlogs(true);
   };
-
-
-
 
   const deleteHandler = (e) => {
     const blogId = e.target.value;
     console.log(blogId);
-    axios.post('/api/blogs/deleteblog', { blogId } );
-    setFetchAgain(!fetchAgain)
-  }
-
-
-
+    axios.post("/api/blogs/deleteblog", { blogId });
+    setFetchAgain(!fetchAgain);
+  };
 
   useEffect(() => {
     showBlogs();
   }, [fetchAgain]);
 
-  const handleSearch = async() => {
+  const handleSearch = async () => {
     const { data } = await axios.get(`/api/blogs?search=${search}`);
     setBlogs(data);
     setAllBlogs(false);
-  }
-    const handleSearch2 = async () => {
-      const { data } = await axios.get(`/api/blogs`);
-      setBlogs(data);
-      setAllBlogs(true);
-    };
+  };
+  const handleSearch2 = async () => {
+    const { data } = await axios.get(`/api/blogs`);
+    setBlogs(data);
+    setAllBlogs(true);
+  };
 
   return (
     <div>

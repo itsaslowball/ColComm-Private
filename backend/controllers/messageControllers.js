@@ -9,6 +9,7 @@ const { v4: uuidv4 } = require("uuid");
 
 const reportUser = asyncHandler(async (req, res) => {
   const userId = req.body.userId;
+
   if (userId) {
     let user = await User.findById(userId);
 
@@ -17,6 +18,7 @@ const reportUser = asyncHandler(async (req, res) => {
       { $inc: { totalReports: 1 } },
       { new: true }
     );
+    console.log("User: ", user);
 
     if (user.totalReports > 3) {
       try {

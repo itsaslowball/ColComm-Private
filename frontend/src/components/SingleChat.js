@@ -205,11 +205,15 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     let otherUser = null;
 
     if (selectedChat && selectedChat.users.length === 2) {
-      if (user._id !== selectedChat.users[0]._id) {
-        otherUserId = selectedChat.users[0]._id;
-        otherUser = selectedChat.users[0];
+      if (user._id === selectedChat.users[0]._id) {
+        otherUserId = selectedChat.users[1]._id;
+        otherUser = selectedChat.users[1];
+      } else {
+        otherUserId = selectedChat.users[1]._id;
+        otherUser = selectedChat.users[1];
       }
     }
+
     const config = {
       headers: {
         Authorization: `Bearer ${user.token}`,
