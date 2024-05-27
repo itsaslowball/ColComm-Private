@@ -24,12 +24,15 @@ const AllBlogs = ({ fetchAgain, setFetchAgain }) => {
 
   const showBlogs = async () => {
     let { data } = await axios.get("/api/blogs");
-
+    
+    data = data.filter((b) => {
+      return b.user !== null;
+    });
     data = data.filter((b) => {
       return b.user.name !== "Deleted User";
     });
 
-    console.log("New Data: ", data);
+    
 
     if (data) setBlogs(data);
     setAllBlogs(true);
