@@ -3,6 +3,9 @@
 
 ColComm is a real-time communication platform designed to connect mentees with mentors based on specific fields of expertise and skills. This platform allows users to easily find and communicate with mentors who have the skills they need, ask questions, and receive guidance. The platform features chat capabilities, group discussions, a blog section, and robust AI-driven content moderation to ensure a safe and productive environment.
 
+<img width="1512" alt="image" src="https://github.com/user-attachments/assets/4ce711d4-8044-4635-9852-6e2e0fcb6e86" />
+
+
 ## **Features**
 
 - **Mentor-Mentee Connection**: Mentees can find mentors based on specific skills (e.g., React, Node.js, Placement Preparation), allowing for easier and more targeted help-seeking.
