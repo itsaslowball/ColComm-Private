@@ -42,7 +42,7 @@ Before setting up the project, ensure that you have the following installed:
 Start by cloning the ColComm repository to your local machine:
 
 ```bash
-git clone https://github.com/priyanshu-34/ColComm-Private
+git clone https://github.com/priyanshu-34/ColComm
 ```
 
 ### **Install Dependencies**
