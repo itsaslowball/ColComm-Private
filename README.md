@@ -17,7 +17,7 @@ ColComm is a real-time communication platform designed to connect mentees with m
 
 - **Blog Feature**: Mentors or seniors can write blogs to share insights, tips, or resources with the community. For example, interview preparation tips or coding tutorials can be shared and read by all users.
   
-- **AI-based Content Moderation**: All chat messages undergo an abusive word detection system powered by FastText with Random Forest algorithms. This ensures that harmful content, such as hate speech and offensive language, is filtered out with 94% accuracy.
+- **AI-based Content Moderation**: All chat messages undergo an abusive word detection system. This ensures that harmful content, such as hate speech and offensive language, is filtered out with 94% accuracy.
 
 - **User Reporting System**: Users can report any content or individuals they find inappropriate, ensuring that the community remains safe and productive.
 
